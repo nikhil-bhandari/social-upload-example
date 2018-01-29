@@ -4,13 +4,14 @@ const fs = require('fs');
 const APP_ID = '';
 const APP_SECRET = '';
 const ACCESS_TOKEN = '';
+const LONG_LIVED_ACCESS_TOKEN = '';
 
 FB.options({
     appId: APP_ID,
     appSecret: APP_SECRET
 });
 
-FB.setAccessToken(ACCESS_TOKEN);
+FB.setAccessToken(LONG_LIVED_ACCESS_TOKEN);
 
 
 FB.api('me/videos', 'post', {
@@ -33,4 +34,21 @@ FB.api('me/photos', 'post', {
         return;
     }
     console.log('Post Id: ' + res.post_id);
+});
+
+FB.api('oauth/access_token', {
+    client_id: APP_ID,
+    client_secret: APP_SECRET,
+    grant_type: 'fb_exchange_token',
+    fb_exchange_token: ACCESS_TOKEN
+}, function (res) {
+    if(!res || res.error) {
+        console.log(!res ? 'error occurred' : res.error);
+        return;
+    }
+
+    const accessToken = res.access_token;
+    const expires = res.expires ? res.expires : 0;
+
+    console.log(accessToken, expires)
 });
